@@ -1,0 +1,87 @@
+class Dot {
+  Brain brain;
+
+  PVector pos;
+  PVector vel;
+  PVector acc;
+
+  boolean dead = false;
+
+  boolean isBest = false;
+  boolean reachedGoal = false;
+  float fitness;
+  
+  Dot() {
+    brain = new Brain(400);
+
+    pos = new PVector(50, 750);
+    vel = new PVector(0, 0);
+    acc = new PVector(0, 0);
+  }
+
+  void update() {
+    if (!dead && !reachedGoal) {
+      move();
+      if (pos.x > 1596 || pos.x < 4 || pos.y > 796 || pos.y < 4) {
+        dead = true;
+      }
+      else if (dist(pos.x, pos.y, goal.x, goal.y) < 5) {
+        reachedGoal = true;
+      }
+      else if (pos.x< 1200 && pos.y < 710 && pos.x > 900 && pos.y > 700) {
+        dead = true;
+      } 
+      else if (pos.x < 710 && pos.y < 800 && pos.x > 700 && pos.y > 700) {
+        dead = true;
+      }
+      else if(pos.x < 910 && pos.y < 700 && pos.x > 900 && pos.y > 0) {
+        dead = true;
+      }
+      else if(pos.x < 600 && pos.y < 710 && pos.x > 0 && pos.y > 700) {
+        dead = true;
+      }
+    }
+  }
+
+  void show() {
+    if (isBest) {
+      fill(0, 255, 0);
+      ellipse(pos.x, pos.y, 8, 8);
+   } 
+    else {
+      fill(255);
+      ellipse(pos.x, pos.y, 4, 4);
+    }
+  }
+
+  void move() {
+    if (brain.directions.length > brain.steps) {
+      acc = brain.directions[brain.steps];
+      brain.steps++;
+    }
+    else {
+      dead = true;
+    }
+
+    vel.add(acc);
+       vel.limit(5);
+      pos.add(vel);
+  }
+
+  void calculateFitness() {
+    if (reachedGoal) {
+      fitness = 1 / 16 + 10000 / (float)(brain.steps * brain.steps);
+    }
+    else {
+      float distogoal = dist(pos.x, pos.y, goal.x, goal.y);
+      fitness = 1 / (distogoal * distogoal);
+    }
+  }
+
+  Dot getBaby() {
+    Dot baby = new Dot();
+    baby.brain = brain.clone();
+    return baby;
+  }
+  
+}

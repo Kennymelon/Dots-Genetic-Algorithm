@@ -1,0 +1,110 @@
+class Population{
+  Dot[] dots;
+
+  int bestDot = 0;
+  int maxSteps = 400;
+  int gen = 1;
+
+  float fitnessSum;
+
+  Population(int size) {
+    dots = new Dot[size];
+    for (int i = 0; i < dots.length; i++) {
+      dots[i] = new Dot();
+    }
+  }
+
+  void show() {
+    for (int i = 1; i < dots.length; i++) {
+      dots[i].show();
+    }
+    dots[0].show();
+  }
+
+  void update() {
+    for (int i = 0; i < dots.length; i++) {
+      if (dots[i].brain.steps > maxSteps) {
+        dots[i].dead = true;
+      }
+      else {
+        dots[i].update();
+      }
+    }
+  }
+
+  void calculateFitness() {
+    for (int i = 0; i < dots.length; i++) {
+      dots[i].calculateFitness();
+    }
+  }
+
+  boolean allDotsDead() {
+    for (int i = 0; i < dots.length; i++) {
+      if (!dots[i].dead && !dots[i].reachedGoal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void mutateBabies() {
+    for (int i = 1; i < dots.length; i++) {
+      dots[i].brain.mutate();
+    }
+  }
+
+  void setBestDot() {
+    float best = 0;
+    int bestIndex = 0;
+    for (int i = 0; i < dots.length; i++) {
+      if (dots[i].fitness > best) {
+        best = dots[i].fitness;
+        bestIndex = i;
+      }
+    }
+    bestDot = bestIndex;
+
+    if (dots[bestDot].reachedGoal) {
+      maxSteps = dots[bestDot].brain.steps;
+      println("Steps:", maxSteps);
+    }
+  }
+
+  void calculateFitnessSum() {
+    fitnessSum = 0;
+    for (int i = 0; i < dots.length; i++) {
+      fitnessSum += dots[i].fitness;
+    }
+  }
+
+  Dot selectParent() {
+    float rand = random(fitnessSum);
+    float runningSum = 0;
+    for (int i = 0; i < dots.length; i++) {
+      runningSum += dots[i].fitness;
+      if (runningSum > rand) {
+        return dots[i];
+      }
+    }
+    return null;
+  }
+
+  void naturalSelection() {
+    Dot[] newDots = new Dot[dots.length];
+    setBestDot();
+    calculateFitnessSum();
+
+    newDots[0] = dots[bestDot].getBaby();
+    newDots[0].isBest = true;
+
+    for (int i = 1; i < newDots.length; i++) {
+      Dot parent = selectParent();
+      newDots[i] = parent.getBaby();
+    }
+
+    dots = newDots.clone();
+    gen++;
+
+  }
+
+}

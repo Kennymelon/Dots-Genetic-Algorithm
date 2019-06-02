@@ -1,0 +1,32 @@
+Population test;
+Dot dot;
+PVector goal = new PVector(1550, 700);
+
+void setup() {
+  size(1600, 800);
+  test = new Population(1000);
+  dot = new Dot();
+}
+
+void draw() {
+  background(50);
+  fill(255, 0, 0);
+  ellipse(goal.x, goal.y, 10, 10);
+
+  fill(100);
+  rect(900, 700, 300, 10);
+  rect(700, 700, 10, 100);
+  rect(900, 0, 10, 700);
+  rect(0, 700, 600, 10);
+
+  if (test.allDotsDead()) {
+    test.calculateFitness();
+    test.naturalSelection();
+    test.mutateBabies();
+    println("Gen:" , test.gen);
+  }
+  else {
+    test.show();
+    test.update();
+  }
+}
